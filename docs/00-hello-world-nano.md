@@ -86,6 +86,10 @@ Somewhere on the display board there are also two backlight pads marked **A** (a
 
 ## 4. Wiring, step by step
 
+The complete picture (generated with [tools/wiring_hello_world.py](../tools/wiring_hello_world.py)):
+
+![Wiring diagram: Arduino Nano + PG240128-A hello world](images/wiring-hello-world.png)
+
 Do it in this order and check each step off.
 
 ### Step 4.1 — Power rails
