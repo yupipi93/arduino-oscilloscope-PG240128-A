@@ -25,9 +25,10 @@ Novelty check: **no public Arduino scope uses a T6963C 240×128** — this will 
 | D0/D1 | USB serial (debug, PC streaming later) |
 | **D2, D3** | rotary encoder A/B (both are hardware interrupts) — or 2 buttons. D3 doubles as PWM test-signal out if buttons go elsewhere |
 | D4–D11 | display data bus DB4–DB7 + DB0–DB3 (see [hello world](00-hello-world-nano.md)) |
-| **D12, D13** | encoder push-button / Hold button / range-switch sense |
+| **D12** | HOLD button (to GND, internal pull-up) |
+| D13 | onboard LED only — the LED defeats INPUT_PULLUP, never use it as a button input |
 | A0–A3 | display /CE, C/D, /RST, /WR |
-| A4, A5 | free (I²C reserved — future RTC/expander) |
+| **A4**, A5 | A4 = ×1/×10 range-switch sense (M5); A5 free (I²C still possible) |
 | **A6** | second channel / trigger-level trimmer / ±20 V voltmeter network |
 | **A7** | **the probe input** |
 

@@ -5,8 +5,8 @@ contrast pot, backlight). Each milestone adds its hardware on top:
   M1  + test signal   D3 -[10k]-> A7
   M2  (software only — banner, wiring = M1)
   M3  (software only — banner, wiring = M1)
-  M4  + buttons       D2=SELECT, D13=HOLD (to GND, internal pull-ups)
-  M5  + front-end board -> A7, RANGE sense -> D12, test loop becomes CAL post
+  M4  + buttons       D2=SELECT, D12=HOLD (to GND, internal pull-ups)
+  M5  + front-end board -> A7, RANGE sense -> A4, test loop becomes CAL post
   M6  + CH2 probe -> A6
 
 Technique from multi-rocket-avionica/breadboard-wiring/wiring_diagram.py:
@@ -99,9 +99,9 @@ MILESTONES = {
     3: ("wiring-m3-fast-sampling.png", "M3 — Fast sampling (77 kSps)",
         "Software-only milestone: wiring identical to M1."),
     4: ("wiring-m4-ui-buttons.png", "M4 — UI wiring",
-        "M1 + two buttons to GND: D2 = SELECT, D13 = HOLD (internal pull-ups)."),
+        "M1 + two buttons to GND: D2 = SELECT, D12 = HOLD (internal pull-ups; D13 unusable as input: onboard LED)."),
     5: ("wiring-m5-front-end.png", "M5 — Analog front-end wiring",
-        "Front-end board feeds A7 · RANGE sense on D12 · test PWM becomes a CAL post."),
+        "Front-end board feeds A7 · RANGE sense on A4 · test PWM becomes a CAL post."),
     6: ("wiring-m6-dual-channel.png", "M6 — Dual channel wiring",
         "M5 + second probe into A6. Pre-trigger / PC streaming are software."),
 }
@@ -280,10 +280,9 @@ def draw_buttons(d, nano_xy):
     d2 = nano_xy["D2"]
     draw_pin(d, 1130, 940)                       # SELECT top pin
     wire(d, [d2, (1130, d2[1]), (1130, 940)], COL_BTN)
-    d13 = nano_xy["D13"]
-    draw_pin(d, 1130, 1140)                      # HOLD bottom pin
-    wire(d, [d13, (560, d13[1]), (560, 1300), (1130, 1300), (1130, 1140)],
-         COL_BTN)
+    d12 = nano_xy["D12"]
+    draw_pin(d, 1090, 1100)                      # HOLD left pin
+    wire(d, [d12, (1050, d12[1]), (1050, 1100), (1090, 1100)], COL_BTN)
     # shared GND return
     draw_pin(d, 1170, 980)
     draw_pin(d, 1170, 1100)
@@ -314,12 +313,11 @@ def draw_frontend(d, nano_xy):
     d.text((525, 1004), "OUT", font=F_PINSM, fill=COL_TEXT_LIGHT, anchor="mt")
     wire(d, [(525, 1000), (525, a7[1]), a7], COL_SIG)
 
-    # RANGE sense -> D12 (right edge)
-    d12 = nano_xy["D12"]
+    # RANGE sense -> A4 (right edge, short hop up the left side)
+    a4 = nano_xy["A4"]
     draw_pin(d, 545, 1160)
     d.text((529, 1160), "RANGE", font=F_PINSM, fill=COL_TEXT_LIGHT, anchor="rm")
-    wire(d, [(545, 1160), (605, 1160), (605, 1210), (940, 1210),
-             (940, d12[1]), d12], COL_RANGE)
+    wire(d, [(545, 1160), (575, 1160), (575, a4[1]), a4], COL_RANGE)
 
     # board GND -> GND rail
     wire(d, [(180, 1170), (156, 1170), (156, RAIL_GND_Y)], COL_GND)
@@ -383,12 +381,12 @@ def draw_legend(d, m):
                 "D3 →[10 kΩ]→ A7 — the Nano probes its own ~490 Hz PWM"]))
         if m >= 4:
             entries.append((COL_BTN, "Buttons (M4)", [
-                "D2 = SELECT · D13 = HOLD — to GND, internal pull-ups"]))
+                "D2 = SELECT · D12 = HOLD — to GND, internal pull-ups"]))
         if m >= 5:
             entries.append((COL_SIG, "Signal chain (M5)", [
                 "probe → front-end → A7 · D3 →10k→ CAL self-test post"]))
             entries.append((COL_RANGE, "RANGE sense (M5)", [
-                "front-end ×1/×10 switch position → D12 (input pull-up)"]))
+                "front-end ×1/×10 switch position → A4 (input pull-up)"]))
         if m >= 6:
             entries.append((COL_CH2, "Channel 2 (M6)", [
                 "CH2 probe →[10 kΩ + clamps]→ A6"]))

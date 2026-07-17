@@ -67,7 +67,7 @@ Somewhere on the display board there are also two backlight pads marked **A** (a
 
 ```
                      ┌───────USB───────┐
-   (future button) ──│ D12         D13 │── (future button)
+   (future button) ──│ D12         D13 │── (LED only, not a button)
                      │ 3V3        AREF │
    /CE  ◄────────────│ A0           D2 │── (future button/encoder)
    C/D  ◄────────────│ A1           D3 │── (future button/encoder)
@@ -251,6 +251,6 @@ With this exact wiring, the oscilloscope project continues using:
 
 - **A7** → the analog signal input (probe) — see [analog front-end doc](03-analog-front-end-and-trigger.md)
 - **D2 / D3** → buttons (they support hardware interrupts)
-- **D12 / D13** → more buttons or status LED
+- **D12** → HOLD button (D13 stays as LED — its onboard LED defeats input pull-ups)
 
 Continue with the [build plan](04-build-plan.md).

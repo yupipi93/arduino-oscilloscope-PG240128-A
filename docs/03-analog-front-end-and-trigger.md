@@ -57,7 +57,7 @@ Solves the source-impedance problem (ADC wants ≤10 kΩ) and enables millivolt 
 
 ### Range switching
 
-An SPDT/rotary switch selects which network feeds A7 (×1 = A/B, ×10 = C); a spare Nano pin (D12, input pull-up) *reads* the switch so the firmware scales the graticule automatically. A real **P6100-class 10:1 probe (~€10–15)** in front of everything is the best upgrade: 10 MΩ loading, compensated, insulated, rated.
+An SPDT/rotary switch selects which network feeds A7 (×1 = A/B, ×10 = C); a spare Nano pin (A4, input pull-up) *reads* the switch so the firmware scales the graticule automatically. A real **P6100-class 10:1 probe (~€10–15)** in front of everything is the best upgrade: 10 MΩ loading, compensated, insulated, rated.
 
 ## Trigger: how the trace stands still
 
