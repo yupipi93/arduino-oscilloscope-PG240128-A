@@ -85,7 +85,7 @@ Why 1 %: these three resistors *are* the ×10 scale factor — 5 % tolerance wou
 | Part | Role | ~€ |
 |---|---|---|
 | 10 kΩ + 2× BAT85 (repeat of #2/#3) | minimal second channel into A6 | 0.15 |
-| KY-040 rotary encoder | nicer UI than buttons (D2/D3 interrupts) — only if you want it; costs the D3 test-signal pin | 1 |
+| KY-040 rotary encoder — **threaded-bushing version** (M7 thread + nut, for panel-mounting in the M6 case; add a push-on knob) | nicer UI than buttons (D2/D3 interrupts) — only if you want it; costs the D3 test-signal pin | 1 |
 | 3D-printed case | mechanical polish — no purchase, just filament | — |
 
 Pre-trigger, PC streaming and equivalent-time sampling are **pure software** — zero components.
