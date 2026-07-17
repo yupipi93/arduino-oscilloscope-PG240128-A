@@ -136,6 +136,8 @@ Why so weird? The LCD glass needs about **−7 V** to become visible. The displa
 
 Never connect A straight to 5 V — the resistor limits the LED current.
 
+> **Variant — adjustable brightness:** a multiturn trimmer in place of the fixed resistor works nicely (tested). Keep a small fixed resistor (~10 Ω) in series with it, so the trimmer's low extreme can never reach 0 Ω and burn the LEDs.
+
 ### Step 4.5 — The 12 signal wires
 
 13–20. Data bus (order matters — note it is *not* sequential!):

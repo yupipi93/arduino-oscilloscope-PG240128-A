@@ -33,6 +33,7 @@ Building a single-channel hobby oscilloscope from an **Arduino Nano** and a **Po
 | [02-adc-and-sampling.md](docs/02-adc-and-sampling.md) | ATmega328P ADC: prescalers, free-running mode, real sample rates and resolution |
 | [03-analog-front-end-and-trigger.md](docs/03-analog-front-end-and-trigger.md) | Input circuits (0–5 V, AC, ±20 V), protection, safety, trigger design, calibration, BOM |
 | [04-build-plan.md](docs/04-build-plan.md) | Pin budget, RAM budget, architecture, milestones M0–M6 |
+| [05-build-log.md](docs/05-build-log.md) | Real-hardware progress diary (what actually happened) |
 
 ## Companion repository
 
@@ -40,7 +41,7 @@ Display documentation lives in its own repo: **[lcd-pg-240128A](https://github.c
 
 ## Status
 
-- ✅ M0 — display hello world (guide written)
+- ✅ M0 — display hello world — **verified on real hardware 2026-07-17** ([build log](docs/05-build-log.md))
 - ⬜ M1 — static waveform viewer
 - ⬜ M2 — trigger
 - ⬜ M3 — fast sampling (77 kSps)
