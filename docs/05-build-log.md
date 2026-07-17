@@ -2,6 +2,16 @@
 
 Real-hardware progress diary. Newest entries first.
 
+## 2026-07-17 — ✅ M3 verified · design fix (D13) · M4 uploaded
+
+**M3 confirmed on hardware**: ~1.6 cycles at the 77 kSps tier, serial time-base control working across all 10 tiers.
+
+**Design fix caught during M4 prep:** the plan had the HOLD button on D13, but the Nano's onboard LED loads that pin (~1.9 V against the internal pull-up = permanent LOW) — a D13 button can never work. **HOLD → D12; the M5 RANGE sense → A4.** Diagrams and docs updated.
+
+**M4 (`firmware/scope_ui/`) compiled (13 240 B flash / 1 129 B RAM) and uploaded**: 200-px waveform + 40-px readout panel (time base, mode, state, Vpp, frequency), dotted graticule, trigger marker, and two buttons — SELECT (D2): short = time base, long = trigger mode AUTO/NORM/ONE; HOLD (D12): freeze / re-arm. Runs without buttons wired (defaults AUTO). Vpp assumes Vcc = 5.00 V until the M5 calibration.
+
+Also added [docs/06-components.md](06-components.md) — the full component list to finish the project (~€3.20 mandatory for M4+M5).
+
 ## 2026-07-17 — ✅ M2 verified: the wave stands still · M3 uploaded
 
 **M2 confirmed on hardware**: square wave locked in place, trigger marker and TRIG/FREE readout behaving as designed, and the drift-induced ghosting gone with the stable trace — exactly the predicted fix.
