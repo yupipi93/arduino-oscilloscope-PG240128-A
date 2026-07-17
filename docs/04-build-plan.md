@@ -65,23 +65,37 @@ Sampling and drawing never overlap (12 GPIOs toggling would pollute the ADC). At
 ### ✅ M0 — Hello world ([done — the guide](00-hello-world-nano.md))
 Display wired with the scope-ready pin map, U8g2 page mode running.
 
+![M0 wiring](images/wiring-hello-world.png)
+
 ### M1 — Static waveform viewer
 `analogRead(A7)` into the 240-byte buffer with no trigger, draw buffer as connected lines + border. Feed it the Nano's own PWM (`analogWrite(3, 128)` = 490 Hz square) through Design A (10 kΩ into A7). **Success: a square wave scrolls by.**
+
+![M1 wiring](images/wiring-m1-waveform-viewer.png)
 
 ### M2 — Trigger
 Poll-then-capture rising-edge trigger with hysteresis + 250 ms auto free-run. **Success: the square wave stands still.**
 
+![M2 — no new wiring](images/wiring-m2-trigger.png)
+
 ### M3 — Fast sampling
 Free-running ADC, prescaler 16, ADLAR, polled burst capture; two-tier time base (prescaler tiers + timed slow tiers), 1-2-5 steps. **Success: a 5 kHz sine from a phone signal-generator app (through Design B) displays cleanly.**
+
+![M3 — no new wiring](images/wiring-m3-fast-sampling.png)
 
 ### M4 — UI
 Grid/graticule, right-side readout panel (V/div, t/div, trigger mode/level marker, Vpp, frequency), encoder/buttons: time base, trigger level, Hold, single-shot. Modes Auto/Normal/One (Mitsunaga vocabulary).
 
+![M4 wiring](images/wiring-m4-ui-buttons.png)
+
 ### M5 — Front-end board
 Breadboard → stripboard: Designs A+B+C with the ×1/×10 switch and AC/DC switch, calibration procedure (bandgap Vcc + two-point), safe-limits label.
 
+![M5 wiring](images/wiring-m5-front-end.png)
+
 ### M6 — Polish (pick and choose)
 Second channel on A6 · pre-trigger capture (circular buffer) · PC streaming over serial · equivalent-time sampling for repetitive signals (GOscillo's 16 MSps-equivalent trick) · 3D-printed case.
+
+![M6 wiring](images/wiring-m6-dual-channel.png)
 
 ## Code reuse policy
 
