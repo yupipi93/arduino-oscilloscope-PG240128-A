@@ -2,6 +2,18 @@
 
 Real-hardware progress diary. Newest entries first.
 
+## 2026-07-17 — ✅ M1 verified on hardware · M2 uploaded
+
+**M1 works, confirmed with photos.** With `D3 —[10 kΩ]→ A7` bridged:
+
+- PWM test signal: ~13 square-wave cycles across the screen, ~18–19 columns per cycle — matching the math exactly (490 Hz @ ~9.6 kSps → 12.8 cycles/240 columns). Flat tops/bottoms, connected vertical edges.
+- Finger-on-the-resistor test: large drifting diagonals/X patterns = **1.25 cycles of 50 Hz mains hum per 25 ms sweep** — the scope's first real-world signal.
+- As predicted, the untriggered trace drifts phase every sweep ("dances").
+
+**Ghosting observation:** multiple faint superimposed traces. Two causes: (1) untriggered drift means each refresh lights *different* pixels while the slow STN panel (~150–300 ms pixel decay) still shows the previous ones — fixed by the M2 trigger (stable trace = same pixels every frame); (2) inherent STN pixel persistence — minor once the image is stable; slightly backing off an over-driven contrast pot also reduces smearing.
+
+**M2 (`firmware/triggered_viewer/`) compiled (9 798 B flash / 927 B RAM) and uploaded** — poll-then-capture rising-edge trigger at mid-scale with ±4-count hysteresis, 250 ms auto free-run timeout, trigger-level marker and TRIG/FREE readout. Success criterion: the square wave stands still.
+
 ## 2026-07-17 — ✅ M0 complete: hello world running on real hardware
 
 **The display works.** "Hello, PG240128-A!" on screen, contrast dialed in, adjustable backlight lit.
