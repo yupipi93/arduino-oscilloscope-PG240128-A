@@ -34,6 +34,7 @@ Building a single-channel hobby oscilloscope from an **Arduino Nano** and a **Po
 | [03-analog-front-end-and-trigger.md](docs/03-analog-front-end-and-trigger.md) | Input circuits (0–5 V, AC, ±20 V), protection, safety, trigger design, calibration, BOM |
 | [04-build-plan.md](docs/04-build-plan.md) | Pin budget, RAM budget, architecture, milestones M0–M6 |
 | [05-build-log.md](docs/05-build-log.md) | Real-hardware progress diary (what actually happened) |
+| [06-components.md](docs/06-components.md) | Detailed component list to finish the project (M4–M6), with buy list |
 
 ## Companion repository
 
