@@ -2,6 +2,12 @@
 
 Real-hardware progress diary. Newest entries first.
 
+## 2026-07-17 — ✅ M2 verified: the wave stands still · M3 uploaded
+
+**M2 confirmed on hardware**: square wave locked in place, trigger marker and TRIG/FREE readout behaving as designed, and the drift-induced ghosting gone with the stable trace — exactly the predicted fix.
+
+**M3 (`firmware/fast_sampler/`) compiled (11 432 B flash / 1 220 B RAM) and uploaded**: ADC moved to register-level free-running mode with ADLAR (analogRead retired), 10-tier time base from 1.6 ms to 1.2 s per screen (prescaler tiers /8…/128 + micros()-paced slow tiers). Tier selection over serial (115200 baud, `+`/`-`) until the M4 buttons replace it. Default tier: ~77 kSps. Success criterion: ~1.6 cycles of the 490 Hz PWM, still standing, edges one column wide.
+
 ## 2026-07-17 — ✅ M1 verified on hardware · M2 uploaded
 
 **M1 works, confirmed with photos.** With `D3 —[10 kΩ]→ A7` bridged:
