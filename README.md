@@ -46,7 +46,7 @@ Display documentation lives in its own repo: **[lcd-pg-240128A](https://github.c
 - ✅ M1 — static waveform viewer — **verified on real hardware 2026-07-17** (square wave + 50 Hz hum)
 - ✅ M2 — trigger — **verified on real hardware 2026-07-17** (wave stands still)
 - ✅ M3 — fast sampling (77 kSps) — **verified on real hardware 2026-07-17** (10-tier time base)
-- 🔄 M4 — UI (grid, readouts, buttons) — firmware uploaded, verification pending
+- ✅ M4 — UI (grid, readouts, buttons, auto-scale) — **verified on real hardware 2026-07-17**
 - ⬜ M5 — analog front-end board
 - ⬜ M6 — polish (2nd channel, pre-trigger, PC streaming…)
 

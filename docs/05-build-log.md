@@ -2,6 +2,16 @@
 
 Real-hardware progress diary. Newest entries first.
 
+## 2026-07-17 — ✅ M4 verified: full UI working on hardware
+
+Photo-confirmed at 0.1 s/scr: graticule, panel readouts (Vpp 4.98 V, 50 Hz), AUTO+TRIG locking mains hum, buttons navigating the time base, vertical auto-scale framing the trace.
+
+Two UX refinements landed during verification: **scope-style controls** (SEC/DIV +/− with long-press TRIG MODE and RUN/STOP; frozen state shows STOP) and **vertical auto-scale** (captured min..max mapped to the screen with a 6-px margin, ≥0.2 V clamp, trigger marker hidden when out of view, "Vauto" indicator).
+
+Nice teaching moment from the finger-on-the-resistor test: the 50 Hz hum shows **flat-topped (clipped)** — body-coupled mains far exceeds the 0–5 V input range and saturates at the rails (Vpp reads exactly full scale). The clipping always happened; the old fixed scale drew the flats on top of the frame lines where they were invisible. The M5 ×10 front-end range exists precisely to bring such signals into view unclipped.
+
+Next: **M5** once components arrive ([shopping list](06-components.md)). Software-side prep possible meanwhile: bandgap Vcc calibration so Vpp stops assuming 5.00 V.
+
 ## 2026-07-17 — ✅ M3 verified · design fix (D13) · M4 uploaded
 
 **M3 confirmed on hardware**: ~1.6 cycles at the 77 kSps tier, serial time-base control working across all 10 tiers.
