@@ -5,7 +5,7 @@ contrast pot, backlight). Each milestone adds its hardware on top:
   M1  + test signal   D3 -[10k]-> A7
   M2  (software only — banner, wiring = M1)
   M3  (software only — banner, wiring = M1)
-  M4  + buttons       D2=SELECT, D12=HOLD (to GND, internal pull-ups)
+  M4  + buttons       SEC/DIV + (D2), SEC/DIV - (D12) to GND
   M5  + front-end board -> A7, RANGE sense -> A4, test loop becomes CAL post
   M6  + CH2 probe -> A6
 
@@ -44,6 +44,7 @@ F_PINSM  = load_font(14, bold=True)
 F_LEG    = load_font(20, bold=True)
 F_LEGSM  = load_font(16)
 F_BANNER = load_font(26, bold=True)
+F_TINY   = load_font(13)
 
 COL_5V    = (215, 40, 40)
 COL_GND   = (35, 35, 40)
@@ -99,7 +100,7 @@ MILESTONES = {
     3: ("wiring-m3-fast-sampling.png", "M3 — Fast sampling (77 kSps)",
         "Software-only milestone: wiring identical to M1."),
     4: ("wiring-m4-ui-buttons.png", "M4 — UI wiring",
-        "M1 + two buttons to GND: D2 = SELECT, D12 = HOLD (internal pull-ups; D13 unusable as input: onboard LED)."),
+        "M1 + buttons SEC/DIV + (D2) and SEC/DIV − (D12) to GND — small text = long-press function. (D13 unusable: onboard LED)."),
     5: ("wiring-m5-front-end.png", "M5 — Analog front-end wiring",
         "Front-end board feeds A7 · RANGE sense on A4 · test PWM becomes a CAL post."),
     6: ("wiring-m6-dual-channel.png", "M6 — Dual channel wiring",
@@ -269,24 +270,29 @@ def draw_test_signal(d, nano_xy, as_cal=False):
 
 
 def draw_buttons(d, nano_xy):
-    """M4+: SELECT on D2, HOLD on D13, both to GND (internal pull-ups)."""
-    for (bx0, by0, label) in ((1090, 940, "SELECT"), (1090, 1060, "HOLD")):
+    """M4+: SEC/DIV + on D2, SEC/DIV - on D12 (to GND, internal pull-ups).
+    Small text under each button = its long-press secondary function."""
+    buttons = ((1090, 940,  "SEC/DIV +", "long: TRIG MODE"),
+               (1090, 1080, "SEC/DIV −", "long: RUN/STOP"))
+    for (bx0, by0, label, sub) in buttons:
         d.rounded_rectangle((bx0, by0, bx0 + 80, by0 + 80), radius=10,
                             fill=COL_BTN_BODY, outline=COL_OUTLINE, width=3)
         d.ellipse((bx0 + 24, by0 + 24, bx0 + 56, by0 + 56),
                   fill=(180, 60, 60), outline=COL_OUTLINE, width=2)
         d.text((bx0 + 40, by0 + 86), label, font=F_PINSM, fill=COL_TEXT, anchor="mt")
+        d.text((bx0 + 40, by0 + 104), sub, font=F_TINY, fill=(110, 110, 116),
+               anchor="mt")
 
     d2 = nano_xy["D2"]
-    draw_pin(d, 1130, 940)                       # SELECT top pin
+    draw_pin(d, 1130, 940)                       # SEC/DIV + top pin
     wire(d, [d2, (1130, d2[1]), (1130, 940)], COL_BTN)
     d12 = nano_xy["D12"]
-    draw_pin(d, 1090, 1100)                      # HOLD left pin
-    wire(d, [d12, (1050, d12[1]), (1050, 1100), (1090, 1100)], COL_BTN)
+    draw_pin(d, 1090, 1120)                      # SEC/DIV - left pin
+    wire(d, [d12, (1050, d12[1]), (1050, 1120), (1090, 1120)], COL_BTN)
     # shared GND return
     draw_pin(d, 1170, 980)
-    draw_pin(d, 1170, 1100)
-    wire(d, [(1170, 1100), (1200, 1100), (1200, 980)], COL_GND)
+    draw_pin(d, 1170, 1120)
+    wire(d, [(1170, 1120), (1200, 1120), (1200, 980)], COL_GND)
     wire(d, [(1170, 980), (1200, 980), (1200, RAIL_GND_Y)], COL_GND)
 
 
@@ -380,8 +386,10 @@ def draw_legend(d, m):
             entries.append((COL_SIG, "Test signal (M1)", [
                 "D3 →[10 kΩ]→ A7 — the Nano probes its own ~490 Hz PWM"]))
         if m >= 4:
-            entries.append((COL_BTN, "Buttons (M4)", [
-                "D2 = SELECT · D12 = HOLD — to GND, internal pull-ups"]))
+            entries.append((COL_BTN, "Buttons (M4) — short press / long press", [
+                "SEC/DIV + (D2): slower sweep / TRIG MODE (AUTO-NORM-ONE)",
+                "SEC/DIV − (D12): faster sweep / RUN-STOP (freeze, re-arm)",
+                "to GND, internal pull-ups — no resistors needed"]))
         if m >= 5:
             entries.append((COL_SIG, "Signal chain (M5)", [
                 "probe → front-end → A7 · D3 →10k→ CAL self-test post"]))

@@ -5,12 +5,12 @@
  * right-side panel with time base, trigger mode/state, Vpp and
  * frequency (GOscillo / Wu Hanqing convention, docs/01).
  *
- * Controls (to GND, internal pull-ups — no resistors):
- *   SELECT = D2   short press: slower time base (zoom out)
- *                 long press (>0.7 s): trigger mode AUTO -> NORM -> ONE
- *   HOLD   = D12  short press: faster time base (zoom in)
- *                 long press (>0.7 s): freeze/unfreeze display
- *                                      (in ONE mode: re-arm the single shot)
+ * Controls (to GND, internal pull-ups — no resistors), scope naming:
+ *   SEC/DIV + = D2   short press: slower sweep (zoom out)
+ *                    long press (>0.7 s): trigger mode AUTO -> NORM -> ONE
+ *   SEC/DIV - = D12  short press: faster sweep (zoom in)
+ *                    long press (>0.7 s): RUN/STOP (freeze display;
+ *                                         in ONE mode: re-arm the shot)
  *   (D13 is NOT usable as a button: the onboard LED defeats the pull-up.)
  *
  * Trigger modes (Mitsunaga vocabulary, docs/01):
@@ -33,8 +33,8 @@ U8G2_T6963_240X128_1_8080 u8g2(U8G2_R0,
 #define N_SAMPLES   200          // one per waveform column (0..199)
 #define PANEL_X     200
 #define TEST_PWM_PIN  3
-#define BTN_SELECT    2
-#define BTN_HOLD     12
+#define BTN_SDIV_PLUS   2   // SEC/DIV +
+#define BTN_SDIV_MINUS 12   // SEC/DIV -
 #define TRIG_LEVEL  128
 #define TRIG_HYST     4
 #define LONG_PRESS  700          // ms
@@ -93,7 +93,7 @@ static inline uint8_t adcNext(void) {
 }
 
 static inline bool anyButtonDown(void) {
-  return !digitalRead(BTN_SELECT) || !digitalRead(BTN_HOLD);
+  return !digitalRead(BTN_SDIV_PLUS) || !digitalRead(BTN_SDIV_MINUS);
 }
 
 // 1 = triggered, 0 = timeout, -1 = button pressed (abort, keep screen)
@@ -162,8 +162,8 @@ struct Btn {
   bool longFired;
   unsigned long tChange, tDown;
 };
-Btn btnSel  = { BTN_SELECT, false, false, 0, 0 };
-Btn btnHold = { BTN_HOLD,   false, false, 0, 0 };
+Btn btnSel  = { BTN_SDIV_PLUS,  false, false, 0, 0 };
+Btn btnHold = { BTN_SDIV_MINUS, false, false, 0, 0 };
 
 // Explicit prototype: the .ino preprocessor would otherwise hoist an
 // auto-generated one above the Btn struct definition and fail to build.
@@ -209,7 +209,7 @@ void handleButtons(void) {
 static inline uint8_t sample_to_y(uint8_t s) { return 127 - (s >> 1); }
 
 const char *statusText(void) {
-  if (hold)      return trigMode == MODE_ONE ? "HOLD" : "HOLD";
+  if (hold)      return "STOP";
   if (triggered) return "TRIG";
   if (trigMode == MODE_AUTO) return "FREE";
   return trigMode == MODE_ONE ? "ARM" : "WAIT";
@@ -266,8 +266,8 @@ void draw(void) {
 
 // ---- main ---------------------------------------------------------------
 void setup(void) {
-  pinMode(BTN_SELECT, INPUT_PULLUP);
-  pinMode(BTN_HOLD,   INPUT_PULLUP);
+  pinMode(BTN_SDIV_PLUS,  INPUT_PULLUP);
+  pinMode(BTN_SDIV_MINUS, INPUT_PULLUP);
   u8g2.begin();
   analogWrite(TEST_PWM_PIN, 128);
 }
