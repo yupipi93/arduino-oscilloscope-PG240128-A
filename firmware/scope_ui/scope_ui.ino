@@ -23,6 +23,12 @@
  * the display (the true amplitude is the Vpp readout). Small ranges
  * are clamped (>=0.2 V) so flat/DC signals don't amplify noise.
  *
+ * Vcc calibration ("secret voltmeter", docs/02): the internal 1.1 V
+ * bandgap is measured against AVcc to compute the real supply voltage,
+ * so Vpp uses true millivolts instead of assuming 5.00 V. The boot
+ * splash shows the measured Vcc; refine once with a multimeter by
+ * scaling BANDGAP_MV: new = 1100 * (Vcc_meter / Vcc_displayed).
+ *
  * Runs fine with no buttons wired (defaults: AUTO, ~74 kSps tier).
  * Wiring: docs/images/wiring-m4-ui-buttons.png
  * Vpp assumes Vcc = 5.00 V — calibration arrives in M5 (docs/03).
@@ -43,6 +49,9 @@ U8G2_T6963_240X128_1_8080 u8g2(U8G2_R0,
 #define TRIG_LEVEL  128
 #define TRIG_HYST     4
 #define LONG_PRESS  700          // ms
+#define BANDGAP_MV 1100UL        // this chip's bandgap; calibrate with a
+                                 // multimeter: new = 1100 * Vmeter/Vshown
+#define VCC_PERIOD 5000          // remeasure Vcc every 5 s
 
 // ---- time base ---------------------------------------------------------
 // us10 = sample period in 0.1 us units (for frequency math).
@@ -77,9 +86,27 @@ uint8_t  tier = 1;               // ~74 kSps
 uint8_t  trigMode = MODE_AUTO;
 bool     hold = false;
 bool     triggered = false;
+uint16_t vcc_mV = 5000;          // measured supply voltage (the "ruler")
 uint16_t vpp_cv = 0;             // Vpp in centivolts
 uint32_t freq_hz = 0;            // 0 = unknown
 uint8_t  v_mn = 0, v_mx = 255;   // capture min/max (vertical auto-scale)
+
+// Measure Vcc via the internal 1.1 V bandgap: ADC input = bandgap,
+// reference = AVcc  ->  Vcc = BANDGAP_MV * 1023 / reading.
+uint16_t readVccmV(void) {
+  ADCSRA = _BV(ADEN) | _BV(ADPS2) | _BV(ADPS1) | _BV(ADPS0);  // /128, single
+  ADMUX  = _BV(REFS0) | 0x0E;          // AVcc reference, MUX=1110 = bandgap
+  delay(3);                            // let the bandgap + S/H settle
+  uint32_t acc = 0;
+  for (uint8_t i = 0; i < 8; i++) {
+    ADCSRA |= _BV(ADSC);
+    while (ADCSRA & _BV(ADSC)) ;
+    uint16_t v = ADCL;                 // ADCL first, then ADCH (10-bit)
+    v |= (uint16_t)ADCH << 8;
+    if (i >= 2) acc += v;              // discard the first two readings
+  }
+  return (uint32_t)(BANDGAP_MV * 1023UL) / (acc / 6);
+}
 
 // ---- ADC (registers only, free-running, 8-bit ADLAR) --------------------
 void adcInit(uint8_t adps) {
@@ -138,7 +165,7 @@ void measure(void) {
     if (samples[i] < mn) mn = samples[i];
     if (samples[i] > mx) mx = samples[i];
   }
-  vpp_cv = (uint16_t)((uint32_t)(mx - mn) * 500 / 256);
+  vpp_cv = (uint16_t)((uint32_t)(mx - mn) * vcc_mV / 2560);
   v_mn = mn;
   v_mx = mx;
 
@@ -300,15 +327,39 @@ void draw(void) {
 }
 
 // ---- main ---------------------------------------------------------------
+void drawSplash(void) {
+  char buf[24];
+  snprintf(buf, sizeof(buf), "Vcc = %u.%02u V", vcc_mV / 1000,
+           (vcc_mV % 1000) / 10);
+  u8g2.firstPage();
+  do {
+    u8g2.setFont(u8g2_font_ncenB14_tr);
+    u8g2.drawStr(40, 50, "PG240128-A scope");
+    u8g2.setFont(u8g2_font_7x13_tr);
+    u8g2.drawStr(40, 74, buf);
+    u8g2.setFont(u8g2_font_6x10_tr);
+    u8g2.drawStr(40, 92, "bandgap-calibrated supply");
+    u8g2.drawFrame(0, 0, 240, 128);
+  } while (u8g2.nextPage());
+}
+
 void setup(void) {
   pinMode(BTN_SDIV_PLUS,  INPUT_PULLUP);
   pinMode(BTN_SDIV_MINUS, INPUT_PULLUP);
   u8g2.begin();
   analogWrite(TEST_PWM_PIN, 128);
+  vcc_mV = readVccmV();
+  drawSplash();
+  delay(2000);
 }
 
 void loop(void) {
+  static unsigned long tVcc = 0;
   handleButtons();
+  if (millis() - tVcc > VCC_PERIOD) {   // track the supply as it drifts
+    tVcc = millis();
+    vcc_mV = readVccmV();
+  }
   if (!hold) {
     adcInit(TIERS[tier].adps ? TIERS[tier].adps : ADPS_128);
     int8_t t = waitForTrigger(trigMode == MODE_AUTO ? 250 : 150);

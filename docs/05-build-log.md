@@ -2,6 +2,12 @@
 
 Real-hardware progress diary. Newest entries first.
 
+## 2026-07-17 — M4.5 (software, no new hardware): bandgap Vcc calibration
+
+The "secret voltmeter": the ADC measures the internal 1.1 V bandgap against AVcc, giving the real supply voltage (`Vcc = 1.1 * 1023 / reading`). Vpp now uses true millivolts instead of assuming 5.00 V; Vcc is re-measured every 5 s and shown on a 2 s boot splash.
+
+One-time refinement with a multimeter (when available): measure the 5V pin, compare with the splash value, set `BANDGAP_MV = 1100 * Vmeter / Vshown` in `firmware/scope_ui`. Uncalibrated bandgap tolerance is ±10 % chip-to-chip but rock-stable per chip → after the one-time tweak, ~1 % readings.
+
 ## 2026-07-17 — ✅ M4 verified: full UI working on hardware
 
 Photo-confirmed at 0.1 s/scr: graticule, panel readouts (Vpp 4.98 V, 50 Hz), AUTO+TRIG locking mains hum, buttons navigating the time base, vertical auto-scale framing the trace.
