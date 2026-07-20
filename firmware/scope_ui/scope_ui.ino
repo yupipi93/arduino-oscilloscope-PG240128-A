@@ -6,10 +6,11 @@
  * frequency (GOscillo / Wu Hanqing convention, docs/01).
  *
  * Controls (to GND, internal pull-ups — no resistors):
- *   SELECT = D2   short press: next time base (wraps)
+ *   SELECT = D2   short press: slower time base (zoom out)
  *                 long press (>0.7 s): trigger mode AUTO -> NORM -> ONE
- *   HOLD   = D12  AUTO/NORM: freeze/unfreeze display
- *                 ONE: re-arm the single shot
+ *   HOLD   = D12  short press: faster time base (zoom in)
+ *                 long press (>0.7 s): freeze/unfreeze display
+ *                                      (in ONE mode: re-arm the single shot)
  *   (D13 is NOT usable as a button: the onboard LED defeats the pull-up.)
  *
  * Trigger modes (Mitsunaga vocabulary, docs/01):
@@ -168,12 +169,13 @@ Btn btnHold = { BTN_HOLD,   false, false, 0, 0 };
 // auto-generated one above the Btn struct definition and fail to build.
 void pollBtn(Btn &b, void (*onShort)(), void (*onLong)(), bool fireOnPress);
 
-void selShort(void) { tier = (tier + 1) % N_TIERS; }
-void selLong(void)  {
+void selShort(void)  { tier = (tier + 1) % N_TIERS; }              // zoom out
+void holdShort(void) { tier = (tier + N_TIERS - 1) % N_TIERS; }    // zoom in
+void selLong(void)   {
   trigMode = (trigMode + 1) % 3;
   hold = false;                        // mode change resets hold/arm
 }
-void holdPress(void) {
+void holdLong(void)  {
   if (trigMode == MODE_ONE) hold = false;   // re-arm the single shot
   else                      hold = !hold;
 }
@@ -199,8 +201,8 @@ void pollBtn(Btn &b, void (*onShort)(), void (*onLong)(), bool fireOnPress) {
 }
 
 void handleButtons(void) {
-  pollBtn(btnSel,  selShort,  selLong, false);   // short on release, long on hold
-  pollBtn(btnHold, holdPress, NULL,    true);    // fires on press
+  pollBtn(btnSel,  selShort,  selLong,  false);  // short on release, long on hold
+  pollBtn(btnHold, holdShort, holdLong, false);
 }
 
 // ---- drawing ------------------------------------------------------------
