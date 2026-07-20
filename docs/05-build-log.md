@@ -6,7 +6,7 @@ Real-hardware progress diary. Newest entries first.
 
 The "secret voltmeter": the ADC measures the internal 1.1 V bandgap against AVcc, giving the real supply voltage (`Vcc = 1.1 * 1023 / reading`). Vpp now uses true millivolts instead of assuming 5.00 V; Vcc is re-measured every 5 s and shown on a 2 s boot splash.
 
-One-time refinement with a multimeter (when available): measure the 5V pin, compare with the splash value, set `BANDGAP_MV = 1100 * Vmeter / Vshown` in `firmware/scope_ui`. Uncalibrated bandgap tolerance is ±10 % chip-to-chip but rock-stable per chip → after the one-time tweak, ~1 % readings.
+**Calibrated on hardware the same day:** multimeter read 4.73 V vs splash 4.78 V → `BANDGAP_MV = 1100 × 4.73/4.78 = 1088` (this chip's bandgap is 1.088 V, 1 % under nominal). Voltage readings now accurate to ~1 %. Procedure for other chips: measure the 5V pin, `new = old * Vmeter / Vshown`.
 
 ## 2026-07-17 — ✅ M4 verified: full UI working on hardware
 

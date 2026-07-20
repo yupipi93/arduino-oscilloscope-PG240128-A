@@ -49,8 +49,9 @@ U8G2_T6963_240X128_1_8080 u8g2(U8G2_R0,
 #define TRIG_LEVEL  128
 #define TRIG_HYST     4
 #define LONG_PRESS  700          // ms
-#define BANDGAP_MV 1100UL        // this chip's bandgap; calibrate with a
-                                 // multimeter: new = 1100 * Vmeter/Vshown
+#define BANDGAP_MV 1088UL        // CALIBRATED 2026-07-17: multimeter 4.73 V
+                                 // vs splash 4.78 V -> 1100*4.73/4.78 = 1088.
+                                 // (Recalibrate: new = old * Vmeter/Vshown)
 #define VCC_PERIOD 5000          // remeasure Vcc every 5 s
 
 // ---- time base ---------------------------------------------------------
