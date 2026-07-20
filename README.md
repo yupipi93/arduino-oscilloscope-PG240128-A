@@ -1,6 +1,6 @@
 # Arduino Nano oscilloscope on a PG240128-A
 
-> **signal → protection (10 kΩ) → ADC (77 kSps, 8-bit) → hysteresis trigger → auto-scale → voltage readings within ~1 %.**
+> **signal → protection (10 kΩ) → ADC (77 kSps, 8-bit) → hysteresis trigger → auto-scale → voltage readings within ~1 %.**  
 > Not bad for a €3 Arduino and a screen from the '90s.
 
 Building a single-channel hobby oscilloscope from an **Arduino Nano** and a **Powertip PG240128-A** 240×128 graphic LCD (T6963C controller) — apparently the first documented Arduino scope on this display.
