@@ -18,6 +18,11 @@
  *   NORM  only redraws on trigger (screen keeps last capture)
  *   ONE   arms, captures a single sweep on trigger, then holds
  *
+ * Vertical: continuous auto-scale — each frame maps the captured
+ * min..max to the screen with a 6-px margin, so any amplitude fills
+ * the display (the true amplitude is the Vpp readout). Small ranges
+ * are clamped (>=0.2 V) so flat/DC signals don't amplify noise.
+ *
  * Runs fine with no buttons wired (defaults: AUTO, ~74 kSps tier).
  * Wiring: docs/images/wiring-m4-ui-buttons.png
  * Vpp assumes Vcc = 5.00 V — calibration arrives in M5 (docs/03).
@@ -74,6 +79,7 @@ bool     hold = false;
 bool     triggered = false;
 uint16_t vpp_cv = 0;             // Vpp in centivolts
 uint32_t freq_hz = 0;            // 0 = unknown
+uint8_t  v_mn = 0, v_mx = 255;   // capture min/max (vertical auto-scale)
 
 // ---- ADC (registers only, free-running, 8-bit ADLAR) --------------------
 void adcInit(uint8_t adps) {
@@ -133,6 +139,8 @@ void measure(void) {
     if (samples[i] > mx) mx = samples[i];
   }
   vpp_cv = (uint16_t)((uint32_t)(mx - mn) * 500 / 256);
+  v_mn = mn;
+  v_mx = mx;
 
   // rising-edge crossings with hysteresis -> frequency
   int16_t first = -1, last = -1;
@@ -206,7 +214,28 @@ void handleButtons(void) {
 }
 
 // ---- drawing ------------------------------------------------------------
-static inline uint8_t sample_to_y(uint8_t s) { return 127 - (s >> 1); }
+// Vertical auto-scale: map [scaleLo .. scaleLo+scaleRng] to y 121..6.
+uint8_t scaleLo = 0, scaleRng = 255;
+
+void updateScale(void) {
+  uint8_t lo = v_mn;
+  uint16_t rng = v_mx - v_mn;
+  if (rng < 10) {                    // clamp: >=0.2 V so DC doesn't zoom noise
+    uint8_t mid = lo + rng / 2;
+    lo  = (mid > 5) ? mid - 5 : 0;
+    if (lo > 245) lo = 245;
+    rng = 10;
+  }
+  scaleLo  = lo;
+  scaleRng = rng;
+}
+
+static inline uint8_t sample_to_y(uint8_t s) {
+  int16_t rel = (int16_t)s - scaleLo;
+  if (rel < 0) rel = 0;
+  if (rel > (int16_t)scaleRng) rel = scaleRng;
+  return 6 + (uint8_t)((uint32_t)(scaleRng - rel) * 115 / scaleRng);
+}
 
 const char *statusText(void) {
   if (hold)      return "STOP";
@@ -224,6 +253,9 @@ void draw(void) {
                                         freq_hz / 1000, (freq_hz % 1000) / 100);
   else                         strcpy(fbuf, ">99k");
 
+  updateScale();
+  const bool trig_visible = TRIG_LEVEL >= scaleLo &&
+                            TRIG_LEVEL <= scaleLo + scaleRng;
   const uint8_t trig_y = sample_to_y(TRIG_LEVEL);
 
   u8g2.firstPage();
@@ -240,10 +272,12 @@ void draw(void) {
     u8g2.drawFrame(0, 0, 240, 128);
     u8g2.drawVLine(PANEL_X, 0, 128);
 
-    // trigger-level marker
-    u8g2.drawHLine(1, trig_y, 5);
-    u8g2.drawPixel(6, trig_y - 1);
-    u8g2.drawPixel(6, trig_y + 1);
+    // trigger-level marker (only when the level is inside the view)
+    if (trig_visible) {
+      u8g2.drawHLine(1, trig_y, 5);
+      u8g2.drawPixel(6, trig_y - 1);
+      u8g2.drawPixel(6, trig_y + 1);
+    }
 
     // waveform
     for (uint16_t x = 1; x < N_SAMPLES; x++) {
@@ -257,6 +291,7 @@ void draw(void) {
     u8g2.drawStr(204, 24,  "/scr");
     u8g2.drawStr(204, 46,  MODE_NAMES[trigMode]);
     u8g2.drawStr(204, 58,  statusText());
+    u8g2.drawStr(204, 70,  "Vauto");
     u8g2.drawStr(204, 84,  "Vpp");
     u8g2.drawStr(204, 96,  vbuf);
     u8g2.drawStr(204, 112, "freq");
